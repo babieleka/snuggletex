@@ -5,32 +5,19 @@
  */
 package uk.ac.ed.ph.snuggletex.definitions;
 
-import static uk.ac.ed.ph.snuggletex.definitions.Globals.ALL_MODES;
-import static uk.ac.ed.ph.snuggletex.definitions.Globals.MATH_MODE_ONLY;
-import static uk.ac.ed.ph.snuggletex.definitions.Globals.PARA_MODE_ONLY;
-import static uk.ac.ed.ph.snuggletex.definitions.Globals.TEXT_MODE_ONLY;
-import static uk.ac.ed.ph.snuggletex.definitions.LaTeXMode.LR;
-import static uk.ac.ed.ph.snuggletex.definitions.LaTeXMode.MATH;
-import static uk.ac.ed.ph.snuggletex.definitions.LaTeXMode.PARAGRAPH;
-import static uk.ac.ed.ph.snuggletex.definitions.LaTeXMode.VERBATIM;
-import static uk.ac.ed.ph.snuggletex.definitions.TextFlowContext.ALLOW_INLINE;
-import static uk.ac.ed.ph.snuggletex.definitions.TextFlowContext.IGNORE;
-import static uk.ac.ed.ph.snuggletex.definitions.TextFlowContext.START_NEW_XHTML_BLOCK;
-
 import uk.ac.ed.ph.snuggletex.SnugglePackage;
 import uk.ac.ed.ph.snuggletex.SnuggleRuntimeException;
 import uk.ac.ed.ph.snuggletex.dombuilding.*;
-import uk.ac.ed.ph.snuggletex.semantics.Interpretation;
-import uk.ac.ed.ph.snuggletex.semantics.InterpretationType;
-import uk.ac.ed.ph.snuggletex.semantics.MathBracketInterpretation;
+import uk.ac.ed.ph.snuggletex.semantics.*;
 import uk.ac.ed.ph.snuggletex.semantics.MathBracketInterpretation.BracketType;
-import uk.ac.ed.ph.snuggletex.semantics.MathIdentifierInterpretation;
-import uk.ac.ed.ph.snuggletex.semantics.MathOperatorInterpretation;
-import uk.ac.ed.ph.snuggletex.semantics.StyleDeclarationInterpretation;
 import uk.ac.ed.ph.snuggletex.tokens.FlowToken;
 
 import java.util.MissingResourceException;
 import java.util.ResourceBundle;
+
+import static uk.ac.ed.ph.snuggletex.definitions.Globals.*;
+import static uk.ac.ed.ph.snuggletex.definitions.LaTeXMode.*;
+import static uk.ac.ed.ph.snuggletex.definitions.TextFlowContext.*;
 
 /**
  * This defines the default {@link SnugglePackage} (containing {@link BuiltinCommand} and
@@ -420,6 +407,8 @@ public final class CorePackageDefinitions {
         corePackage.addEnvironment("cases", MATH_MODE_ONLY, MATH, Interpretation.TABULAR, new MatrixHandler(2, "{", ""), null);
         corePackage.addEnvironment("eqnarray", PARA_MODE_ONLY, MATH, Interpretation.TABULAR, new EqnArrayHandler(), START_NEW_XHTML_BLOCK);
         corePackage.addEnvironment("eqnarray*", PARA_MODE_ONLY, MATH, Interpretation.TABULAR, new EqnArrayHandler(), START_NEW_XHTML_BLOCK);
+
+        corePackage.addEnvironment("align", false, 0, MATH_MODE_ONLY, MATH, Interpretation.TABULAR, new AlignHandler(), null);
         
         /* AMS-LaTeX convenience environments */
         corePackage.addEnvironment("matrix", MATH_MODE_ONLY, MATH, Interpretation.TABULAR, new MatrixHandler(), null);
