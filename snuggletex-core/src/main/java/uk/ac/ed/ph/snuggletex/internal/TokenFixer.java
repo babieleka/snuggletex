@@ -498,7 +498,7 @@ public final class TokenFixer {
                  */
                 rowBuilder.add(buildGroupedCommandToken(environmentToken, CorePackageDefinitions.CMD_TABLE_COLUMN, columnBuilder, columnStartStyle));
                 // if it is an align environment, add another column for the operator and skip the handling of it by increasing the iterator
-                if (environmentToken.getEnvironment().getTeXName().equals("align")) {
+                if (environmentToken.getEnvironment().getTeXName().equals("align") && i < size - 1) {
                     List<FlowToken> column = new ArrayList<>(Collections.singletonList(entries.get(++i)));
                     rowBuilder.add(buildGroupedCommandToken(environmentToken, CorePackageDefinitions.CMD_TABLE_COLUMN, column, columnStartStyle));
                 }
