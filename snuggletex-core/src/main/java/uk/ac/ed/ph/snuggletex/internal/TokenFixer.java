@@ -8,30 +8,15 @@ package uk.ac.ed.ph.snuggletex.internal;
 import uk.ac.ed.ph.snuggletex.InputError;
 import uk.ac.ed.ph.snuggletex.SnuggleLogicException;
 import uk.ac.ed.ph.snuggletex.SnuggleSession;
-import uk.ac.ed.ph.snuggletex.definitions.BuiltinCommand;
-import uk.ac.ed.ph.snuggletex.definitions.BuiltinEnvironment;
-import uk.ac.ed.ph.snuggletex.definitions.Command;
-import uk.ac.ed.ph.snuggletex.definitions.ComputedStyle;
-import uk.ac.ed.ph.snuggletex.definitions.CoreErrorCode;
-import uk.ac.ed.ph.snuggletex.definitions.CorePackageDefinitions;
-import uk.ac.ed.ph.snuggletex.definitions.LaTeXMode;
-import uk.ac.ed.ph.snuggletex.definitions.TextFlowContext;
+import uk.ac.ed.ph.snuggletex.definitions.*;
 import uk.ac.ed.ph.snuggletex.semantics.InterpretationType;
 import uk.ac.ed.ph.snuggletex.semantics.MathBracketInterpretation;
 import uk.ac.ed.ph.snuggletex.semantics.MathBracketInterpretation.BracketType;
 import uk.ac.ed.ph.snuggletex.semantics.MathNumberInterpretation;
-import uk.ac.ed.ph.snuggletex.tokens.ArgumentContainerToken;
-import uk.ac.ed.ph.snuggletex.tokens.BraceContainerToken;
-import uk.ac.ed.ph.snuggletex.tokens.CommandToken;
-import uk.ac.ed.ph.snuggletex.tokens.EnvironmentToken;
-import uk.ac.ed.ph.snuggletex.tokens.ErrorToken;
-import uk.ac.ed.ph.snuggletex.tokens.FlowToken;
-import uk.ac.ed.ph.snuggletex.tokens.RootToken;
-import uk.ac.ed.ph.snuggletex.tokens.SimpleToken;
-import uk.ac.ed.ph.snuggletex.tokens.Token;
-import uk.ac.ed.ph.snuggletex.tokens.TokenType;
+import uk.ac.ed.ph.snuggletex.tokens.*;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Stack;
 
@@ -455,9 +440,9 @@ public final class TokenFixer {
      */
     private void fixTabularEnvironmentContent(EnvironmentToken environmentToken)
             throws SnuggleParseException {
-        List<FlowToken> resultBuilder = new ArrayList<FlowToken>();
-        List<CommandToken> rowBuilder = new ArrayList<CommandToken>();
-        List<FlowToken> columnBuilder = new ArrayList<FlowToken>();
+        List<FlowToken> resultBuilder = new ArrayList<>();
+        List<CommandToken> rowBuilder = new ArrayList<>();
+        List<FlowToken> columnBuilder = new ArrayList<>();
         List<FlowToken> contents = environmentToken.getContent().getContents();
         
         /* It's easier to process things if we explicitly add a final explicit "end row"
@@ -466,8 +451,8 @@ public final class TokenFixer {
          * create a fake token.
          */
         List<FlowToken> entries = contents;
-        if (entries.size()>0 && !entries.get(entries.size()-1).isCommand(CorePackageDefinitions.CMD_CHAR_BACKSLASH)) {
-            entries = new ArrayList<FlowToken>(entries);
+        if (!entries.isEmpty() && !entries.get(entries.size() - 1).isCommand(CorePackageDefinitions.CMD_CHAR_BACKSLASH)) {
+            entries = new ArrayList<>(entries);
             entries.add(null);
         }
         
@@ -512,6 +497,11 @@ public final class TokenFixer {
                  * that case carefully.
                  */
                 rowBuilder.add(buildGroupedCommandToken(environmentToken, CorePackageDefinitions.CMD_TABLE_COLUMN, columnBuilder, columnStartStyle));
+                // if it is an align environment, add another column for the operator and skip the handling of it by increasing the iterator
+                if (environmentToken.getEnvironment().getTeXName().equals("align")) {
+                    List<FlowToken> column = new ArrayList<>(Collections.singletonList(entries.get(++i)));
+                    rowBuilder.add(buildGroupedCommandToken(environmentToken, CorePackageDefinitions.CMD_TABLE_COLUMN, column, columnStartStyle));
+                }
                 columnStartStyle = null;
             }
             else if (token.isCommand(CorePackageDefinitions.CMD_HLINE)) {
